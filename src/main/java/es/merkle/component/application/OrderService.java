@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -67,7 +68,7 @@ public class OrderService {
         return submitOrderResponse;
     }
 
-    public ModifyOrderResponse modifyOrder(ModifyOrderRequest modifyOrderRequest) {
+    public Order modifyOrder(ModifyOrderRequest modifyOrderRequest) {
 
         DbOrder dbOrder = orderRepository.findById(modifyOrderRequest.getOrderId())
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
@@ -82,8 +83,8 @@ public class OrderService {
         dbOrder.setFinalPrice(totalPrice);
 
         if (dbProduct.getProductStatus().equals("NOT_AVAILABLE")
-           || dbProduct.getExpiringDate().isAfter(LocalDate.now())
-           || dbProduct.getReleasedDate().isBefore(LocalDate.now())) {
+           || !dbProduct.getExpiringDate().isAfter(LocalDate.now())
+           || !dbProduct.getReleasedDate().isBefore(LocalDate.now())) {
             dbOrder.setStatus(OrderStatus.INVALID);
         } else {
             dbOrder.setStatus(OrderStatus.VALID);
@@ -93,10 +94,7 @@ public class OrderService {
 
         Order orderResponse = convertDbOrderToOrder(dbOrder);
 
-        return ModifyOrderResponse.builder()
-                .order(orderResponse)
-                .message("Order modified successfully")
-                .build();
+        return orderResponse;
     }
 
     private void saveOrder(Order order) {
@@ -131,15 +129,32 @@ public class OrderService {
 
     // Helper method to get Products by IDs
     private List<Product> getProductsByIds(List<String> productIds) {
-        return StreamSupport.stream(productRepository.findAllById(productIds).spliterator(), false)
-                .map(product -> new Product(product.getId(), product.getName(), product.getPrice(), product.getProductStatus()))
-                .collect(Collectors.toList());
+//        return StreamSupport.stream(productRepository.findAllById(productIds).spliterator(), false)
+//                .map(product -> new Product(product.getId(), product.getName(), ProductStatus.fromValue(product.getProductStatus()), ProductCategory.valueOf(product.getProductCategory()), product.getPrice(), product.getExpiringDate(), product.getReleasedDate()))
+//                .collect(Collectors.toList());
+        List<Product> productList = new ArrayList<>();
+        productRepository.findAllById(productIds).forEach(product -> {
+            productList.add(
+                    new Product(product.getId(), product.getName(), ProductStatus.fromValue(product.getProductStatus()), ProductCategory.valueOf(product.getProductCategory()), product.getPrice(), product.getExpiringDate(), product.getReleasedDate())
+            );
+
+        });
+        return productList;
     }
 
     // Helper method to get Customer by ID
     private Customer getCustomerById(String customerId) {
         return customerRepository.findById(customerId)
-                .map(c -> new Customer(c.getId(), c.getName(), c.getAddress(), c.getPhoneNumber()))
+                .map(c -> mapCustomer(c.getId(), c.getName(), c.getAddress(), c.getPhoneNumber()))
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+    }
+
+    private Customer mapCustomer(String id, String name, String address, String phoneNumber) {
+        return Customer.builder()
+                .id(id)
+                .name(name)
+                .address(address)
+                .phoneNumber(phoneNumber)
+                .build();
     }
 }
