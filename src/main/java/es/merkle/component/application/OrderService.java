@@ -1,14 +1,12 @@
 package es.merkle.component.application;
 
+import es.merkle.component.model.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import es.merkle.component.mapper.OrderMapper;
 import es.merkle.component.model.Order;
 import es.merkle.component.model.OrderStatus;
-import es.merkle.component.model.api.CreateOrderRequest;
-import es.merkle.component.model.api.SubmitOrderRequest;
-import es.merkle.component.model.api.SubmitOrderResponse;
 import es.merkle.component.populating.PopulatorRunner;
 import es.merkle.component.repository.adapter.OrderAdapter;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +52,10 @@ public class OrderService {
         }
 
         return submitOrderResponse;
+    }
+
+    public ModifyOrderResponse modifyOrder(ModifyOrderRequest modifyOrderRequest) {
+        return null; //TODO - implement modify operation as per instructions of README file. Task nr1
     }
 
     private void saveOrder(Order order) {
