@@ -47,7 +47,11 @@ public class OrderService {
     }
 
     public SubmitOrderResponse submitOrder(SubmitOrderRequest submitOrderRequest) {
-        Order order = new Order(); // TODO: Idk how to do this
+        DbOrder dbOrder = orderRepository.findById(submitOrderRequest.getOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        Order order = orderMapper.mapToOrder(dbOrder);
+
         SubmitOrderResponse submitOrderResponse = new SubmitOrderResponse();
         submitOrderResponse.setOrder(order);
 
