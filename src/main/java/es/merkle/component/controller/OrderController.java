@@ -3,9 +3,7 @@ package es.merkle.component.controller;
 
 import es.merkle.component.application.OrderService;
 import es.merkle.component.model.Order;
-import es.merkle.component.model.api.CreateOrderRequest;
-import es.merkle.component.model.api.SubmitOrderRequest;
-import es.merkle.component.model.api.SubmitOrderResponse;
+import es.merkle.component.model.api.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,5 +24,11 @@ public class OrderController {
     @ResponseBody
     public SubmitOrderResponse submit(@RequestBody SubmitOrderRequest order) {
         return orderService.submitOrder(order);
+    }
+
+    @PostMapping("/modify")
+    @ResponseBody
+    public ModifyOrderResponse submit(@RequestBody ModifyOrderRequest order) {
+        return orderService.modifyOrder(order);
     }
 }
