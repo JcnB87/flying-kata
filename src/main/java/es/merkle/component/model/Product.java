@@ -1,9 +1,6 @@
 package es.merkle.component.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,6 +9,7 @@ import java.time.LocalDate;
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Product {
     private String id;
     private String name;

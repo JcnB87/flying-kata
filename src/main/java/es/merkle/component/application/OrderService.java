@@ -1,15 +1,25 @@
 package es.merkle.component.application;
 
+import es.merkle.component.model.*;
 import es.merkle.component.model.api.*;
+import es.merkle.component.repository.CustomerRepository;
+import es.merkle.component.repository.OrderRepository;
+import es.merkle.component.repository.ProductRepository;
+import es.merkle.component.repository.entity.DbOrder;
+import es.merkle.component.repository.entity.DbProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import es.merkle.component.mapper.OrderMapper;
-import es.merkle.component.model.Order;
-import es.merkle.component.model.OrderStatus;
 import es.merkle.component.populating.PopulatorRunner;
 import es.merkle.component.repository.adapter.OrderAdapter;
 import lombok.RequiredArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 @RequiredArgsConstructor
@@ -19,6 +29,9 @@ public class OrderService {
     private final PopulatorRunner populatorRunner;
     private final OrderMapper orderMapper;
     private final OrderAdapter orderAdapter;
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final CustomerRepository customerRepository;
 
     public Order createOrder(CreateOrderRequest orderRequest) {
         Order order = mapCreateOrderRequest(orderRequest);
@@ -55,7 +68,35 @@ public class OrderService {
     }
 
     public ModifyOrderResponse modifyOrder(ModifyOrderRequest modifyOrderRequest) {
-        return null; //TODO - implement modify operation as per instructions of README file. Task nr1
+
+        DbOrder dbOrder = orderRepository.findById(modifyOrderRequest.getOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        DbProduct dbProduct = productRepository.findById(modifyOrderRequest.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        dbOrder.getAddingProducts().add(dbProduct.getId());
+
+        BigDecimal totalPrice = dbOrder.getFinalPrice() != null ? dbOrder.getFinalPrice() : BigDecimal.ZERO;
+        totalPrice = totalPrice.add(dbProduct.getPrice());
+        dbOrder.setFinalPrice(totalPrice);
+
+        if (dbProduct.getProductStatus().equals("NOT_AVAILABLE")
+           || dbProduct.getExpiringDate().isAfter(LocalDate.now())
+           || dbProduct.getReleasedDate().isBefore(LocalDate.now())) {
+            dbOrder.setStatus(OrderStatus.INVALID);
+        } else {
+            dbOrder.setStatus(OrderStatus.VALID);
+        }
+
+        orderRepository.save(dbOrder);
+
+        Order orderResponse = convertDbOrderToOrder(dbOrder);
+
+        return ModifyOrderResponse.builder()
+                .order(orderResponse)
+                .message("Order modified successfully")
+                .build();
     }
 
     private void saveOrder(Order order) {
@@ -68,5 +109,37 @@ public class OrderService {
 
     private Order mapCreateOrderRequest(CreateOrderRequest orderRequest) {
         return orderMapper.mapCreateOrderRequestToOrder(orderRequest);
+    }
+
+    private Order convertDbOrderToOrder(DbOrder dbOrder) {
+        // Assuming you have a method to fetch customer and products
+        Customer customer = getCustomerById(dbOrder.getCustomerId());
+        List<Product> addingProducts = getProductsByIds(dbOrder.getAddingProducts());
+        List<Product> removeProducts = getProductsByIds(dbOrder.getRemoveProducts());
+
+        return Order.builder()
+                .id(dbOrder.getId())
+                .customerId(dbOrder.getCustomerId())
+                .orderType(OrderType.ADD)
+                .status(dbOrder.getStatus())
+                .addingProducts(addingProducts)
+                .removeProducts(removeProducts)
+                .finalPrice(dbOrder.getFinalPrice())
+                .customer(customer)
+                .build();
+    }
+
+    // Helper method to get Products by IDs
+    private List<Product> getProductsByIds(List<String> productIds) {
+        return StreamSupport.stream(productRepository.findAllById(productIds).spliterator(), false)
+                .map(product -> new Product(product.getId(), product.getName(), product.getPrice(), product.getProductStatus()))
+                .collect(Collectors.toList());
+    }
+
+    // Helper method to get Customer by ID
+    private Customer getCustomerById(String customerId) {
+        return customerRepository.findById(customerId)
+                .map(c -> new Customer(c.getId(), c.getName(), c.getAddress(), c.getPhoneNumber()))
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
     }
 }
