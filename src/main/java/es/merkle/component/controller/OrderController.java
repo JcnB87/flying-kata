@@ -28,7 +28,7 @@ public class OrderController {
 
     @PostMapping("/modify")
     @ResponseBody
-    public ModifyOrderResponse submit(@RequestBody ModifyOrderRequest order) {
+    public Order modify(@RequestBody ModifyOrderRequest order) {
         return orderService.modifyOrder(order);
     }
 }
