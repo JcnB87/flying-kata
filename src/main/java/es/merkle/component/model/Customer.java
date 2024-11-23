@@ -15,7 +15,4 @@ public class Customer {
     private String address;
     private String phoneNumber;
     private final List<Product> ownedProducts = new ArrayList<>();
-
-    public Customer(String id, String name, String address, String phoneNumber) {
-    }
 }
