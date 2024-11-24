@@ -18,4 +18,9 @@ public class OrderAdapter {
         DbOrder dbOrder = orderMapper.mapToDbOrder(order);
         orderRepository.save(dbOrder);
     }
+
+    public Order retrieveOrder(String orderId) {
+        DbOrder dbOrder = orderRepository.findById(orderId).orElseThrow();
+        return orderMapper.mapToOrder(dbOrder);
+    }
 }
