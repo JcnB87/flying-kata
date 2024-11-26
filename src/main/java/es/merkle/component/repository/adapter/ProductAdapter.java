@@ -1,5 +1,6 @@
 package es.merkle.component.repository.adapter;
 
+import es.merkle.component.exception.ProductNotFoundException;
 import es.merkle.component.mapper.ProductMapper;
 import es.merkle.component.model.Product;
 import es.merkle.component.repository.ProductRepository;
@@ -16,6 +17,6 @@ public class ProductAdapter {
     public Product getProduct(String id) {
         return productRepository.findById(id)
                 .map(productMapper::mapToProduct)
-                .orElseThrow();
+                .orElseThrow(() -> new ProductNotFoundException(id));
     }
 }

@@ -1,5 +1,6 @@
 package es.merkle.component.repository.adapter;
 
+import es.merkle.component.exception.OrderNotFoundException;
 import org.springframework.stereotype.Component;
 import es.merkle.component.mapper.OrderMapper;
 import es.merkle.component.model.Order;
@@ -22,6 +23,6 @@ public class OrderAdapter {
     public Order retrieveOrder(String orderId) {
         return orderRepository.findById(orderId)
                 .map(orderMapper::mapToOrder)
-                .orElseThrow();
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 }
