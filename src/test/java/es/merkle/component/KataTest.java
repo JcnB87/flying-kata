@@ -1,4 +1,4 @@
-package es.merkle.component.controller;
+package es.merkle.component;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

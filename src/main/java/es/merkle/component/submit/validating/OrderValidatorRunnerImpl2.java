@@ -1,7 +1,7 @@
-package es.merkle.component.validating2;
+package es.merkle.component.submit.validating;
 
 import es.merkle.component.model.api.SubmitOrderResponse;
-import es.merkle.component.validating2.validator.OrderValidator2;
+import es.merkle.component.submit.validating.validator.OrderValidator2;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

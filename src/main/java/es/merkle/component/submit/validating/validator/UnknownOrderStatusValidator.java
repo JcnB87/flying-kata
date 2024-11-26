@@ -1,4 +1,4 @@
-package es.merkle.component.validating2.validator;
+package es.merkle.component.submit.validating.validator;
 
 import es.merkle.component.model.Order;
 import es.merkle.component.model.api.SubmitOrderResponse;

@@ -1,4 +1,4 @@
-package es.merkle.component.validating2.validator;
+package es.merkle.component.submit.validating.validator;
 
 import es.merkle.component.model.Order;
 import es.merkle.component.model.OrderStatus;
@@ -6,14 +6,17 @@ import es.merkle.component.model.api.SubmitOrderResponse;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FailedOrderStatusValidator implements OrderValidator2 {
+public class InvalidOrderStatusValidator implements OrderValidator2 {
+
     @Override
     public boolean validate(Order order) {
-        return order.getStatus() == OrderStatus.FAILED;
+        return order.getStatus() == OrderStatus.INVALID;
     }
 
     @Override
     public void updateResponse(SubmitOrderResponse submitOrderResponse) {
-        submitOrderResponse.setMessage("The order was failed");
+        submitOrderResponse.getOrder().setStatus(OrderStatus.FAILED);
+        submitOrderResponse.setMessage("The order was not submitted because it's INVALID");
+
     }
 }

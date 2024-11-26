@@ -1,4 +1,4 @@
-package es.merkle.component.validating;
+package es.merkle.component.modify.validating;
 
 import es.merkle.component.model.Order;
 

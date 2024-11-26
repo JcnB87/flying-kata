@@ -88,26 +88,4 @@ class ModifyOrderControllerTest {
                 .andExpect(jsonPath("$.customer.id").value("customer123"))
                 .andExpect(jsonPath("$.customer.name").value("John Doe"));
     }
-
-//    @Test
-//    void modifyOrder_invalidProductStatus_returnsBadRequestWithMessage() throws Exception {
-//        // Arrange
-//        ModifyOrderRequest request = ModifyOrderRequest.builder()
-//                .orderId("order123")
-//                .productId("product123")
-//                .orderType(OrderType.ADD)
-//                .build();
-//
-//        String expectedErrorMessage = "Product with ID " + request.getProductId() + " is not available.";
-//
-//        when(orderService.modifyOrder(any(ModifyOrderRequest.class)))
-//                .thenThrow(new OrderValidationException(expectedErrorMessage));
-//
-//        // Act & Assert
-//        mockMvc.perform(post("/order-service/modify")
-//                        .contentType("application/json")
-//                        .content("{ \"orderId\": \"order123\", \"productId\": \"product123\", \"orderType\": \"ADD\" }"))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(content().string(expectedErrorMessage));
-//    }
 }

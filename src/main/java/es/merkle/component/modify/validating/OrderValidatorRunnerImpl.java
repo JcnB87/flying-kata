@@ -1,8 +1,8 @@
-package es.merkle.component.validating;
+package es.merkle.component.modify.validating;
 
 import es.merkle.component.model.Order;
 import es.merkle.component.model.OrderStatus;
-import es.merkle.component.validating.validator.OrderValidator;
+import es.merkle.component.modify.validating.validator.OrderValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
