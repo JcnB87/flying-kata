@@ -20,6 +20,8 @@ public class CustomOrderValidator implements OrderValidator {
     public boolean validate(Order order) {
         Product product = productAdapter.getProduct(order.getProcessingProductId());
         LocalDate localDateNow = LocalDate.now();
+
+        // Check if the product is invalid based on the criteria
         return product.getProductStatus() == ProductStatus.NOT_AVAILABLE ||
                 product.getReleasedDate().isAfter(localDateNow) ||
                 product.getExpiringDate().isBefore(localDateNow);
