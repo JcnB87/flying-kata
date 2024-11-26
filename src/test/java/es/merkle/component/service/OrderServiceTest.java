@@ -10,7 +10,6 @@ import es.merkle.component.repository.adapter.OrderAdapter;
 import es.merkle.component.repository.adapter.ProductAdapter;
 import es.merkle.component.repository.entity.DbOrder;
 import es.merkle.component.validating.OrderValidatorRunner;
-import es.merkle.component.validating.validator.CustomOrderValidator;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -53,26 +52,23 @@ public class OrderServiceTest {
     @MockBean
     private OrderMapper orderMapper;
 
-    @MockBean
-    private CustomOrderValidator customOrderValidator;
-
 
     @ParameterizedTest
-    @MethodSource("provideOrderValidationScenarios")
-    void shouldValidateOrderCorrectly(ProductStatus productStatus, LocalDate expiryDate, LocalDate releaseDate, OrderStatus expectedOrderStatus) {
+    @MethodSource("provideOrderValidationAndWithOrderTypeScenarios")
+    void shouldCorrectlyModifyOrderBasedOnOrderType(OrderType orderType, ProductStatus productStatus, LocalDate expiryDate, LocalDate releaseDate, OrderStatus expectedOrderStatus) {
         String orderId = "orderId123";
         String customerId = "customerId123";
         String productId = "productId123";
 
-        ModifyOrderRequest modifyOrderRequest = new ModifyOrderRequest(orderId, OrderType.ADD, productId);
+        ModifyOrderRequest modifyOrderRequest = new ModifyOrderRequest(orderId, orderType, productId);
         DbOrder dbOrder = new DbOrder(orderId, customerId, OrderStatus.NEW, new ArrayList<>(), new ArrayList<>(), BigDecimal.ZERO, "Customer Name");
         Product product = new Product(productId, "Product Name", productStatus, ProductCategory.TV, BigDecimal.TEN, releaseDate, expiryDate);
         Order updatedOrder = new Order(orderId, customerId, null, OrderType.ADD, expectedOrderStatus, List.of(product), new ArrayList<>(), BigDecimal.TEN, null);
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(dbOrder)); // Mock finding DbOrder
-        when(productAdapter.getProduct(productId)).thenReturn(product); // Mock getting Product
-        when(orderMapper.mapModifyOrderRequestToOrder(modifyOrderRequest)).thenReturn(updatedOrder); // Mock mapping from ModifyOrderRequest to Order
-        when(orderAdapter.retrieveOrder(orderId)).thenReturn(updatedOrder); // Mock retrieveOrder in case it's needed
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(dbOrder));
+        when(productAdapter.getProduct(productId)).thenReturn(product);
+        when(orderMapper.mapModifyOrderRequestToOrder(modifyOrderRequest)).thenReturn(updatedOrder);
+        when(orderAdapter.retrieveOrder(orderId)).thenReturn(updatedOrder);
 
         Order resultOrder = orderService.modifyOrder(modifyOrderRequest);
 
@@ -88,12 +84,14 @@ public class OrderServiceTest {
         assertEquals(expectedOrderStatus, resultOrder.getStatus());
     }
 
-    private static Stream<Arguments> provideOrderValidationScenarios() {
+    private static Stream<Arguments> provideOrderValidationAndWithOrderTypeScenarios() {
         return Stream.of(
-                Arguments.of(ProductStatus.AVAILABLE, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30), OrderStatus.VALID),
-                Arguments.of(ProductStatus.NOT_AVAILABLE, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30), OrderStatus.INVALID),
-                Arguments.of(ProductStatus.VIP, LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), OrderStatus.INVALID),
-                Arguments.of(ProductStatus.AVAILABLE, LocalDate.now().minusDays(10), LocalDate.now().minusDays(1), OrderStatus.INVALID)
+                Arguments.of(OrderType.ADD, ProductStatus.AVAILABLE, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30), OrderStatus.VALID),
+                Arguments.of(OrderType.REMOVE, ProductStatus.AVAILABLE, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30), OrderStatus.VALID),
+                Arguments.of(OrderType.ADD, ProductStatus.NOT_AVAILABLE, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30), OrderStatus.INVALID),
+                Arguments.of(OrderType.ADD, ProductStatus.AVAILABLE, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30), OrderStatus.INVALID),
+                Arguments.of(OrderType.REMOVE, ProductStatus.VIP, LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), OrderStatus.INVALID),
+                Arguments.of(OrderType.REMOVE, ProductStatus.AVAILABLE, LocalDate.now().minusDays(10), LocalDate.now().minusDays(1), OrderStatus.INVALID)
         );
     }
 }
