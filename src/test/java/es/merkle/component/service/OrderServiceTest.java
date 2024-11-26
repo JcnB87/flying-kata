@@ -9,7 +9,7 @@ import es.merkle.component.repository.OrderRepository;
 import es.merkle.component.repository.adapter.OrderAdapter;
 import es.merkle.component.repository.adapter.ProductAdapter;
 import es.merkle.component.repository.entity.DbOrder;
-import es.merkle.component.validating.OrderValidatorRunner;
+import es.merkle.component.modify.validating.OrderValidatorRunner;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
