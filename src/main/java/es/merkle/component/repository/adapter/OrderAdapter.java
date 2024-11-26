@@ -20,7 +20,8 @@ public class OrderAdapter {
     }
 
     public Order retrieveOrder(String orderId) {
-        DbOrder dbOrder = orderRepository.findById(orderId).orElseThrow();
-        return orderMapper.mapToOrder(dbOrder);
+        return orderRepository.findById(orderId)
+                .map(orderMapper::mapToOrder)
+                .orElseThrow();
     }
 }
