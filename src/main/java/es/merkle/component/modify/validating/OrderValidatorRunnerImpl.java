@@ -17,7 +17,7 @@ public class OrderValidatorRunnerImpl implements OrderValidatorRunner {
     @Override
     public void run(Order order) {
         for (int i = orderValidators.size() -1; i >= 0; i--) {
-            if (orderValidators.get(i).validate(order)) {
+            if (orderValidators.get(i).validate(order)) { //if true = Invalid
                 orderValidators.get(i).setStatus(order, OrderStatus.INVALID);
             } else {
                 orderValidators.get(i).setStatus(order, OrderStatus.VALID);
