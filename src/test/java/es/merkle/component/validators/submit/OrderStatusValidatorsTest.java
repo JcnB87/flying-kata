@@ -1,5 +1,7 @@
 package es.merkle.component.validators.submit;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import es.merkle.component.model.Order;
 import es.merkle.component.model.OrderStatus;
 import es.merkle.component.model.OrderType;
@@ -11,8 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class OrderStatusValidatorsTest {

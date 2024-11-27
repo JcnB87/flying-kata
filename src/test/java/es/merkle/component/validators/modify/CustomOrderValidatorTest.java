@@ -1,5 +1,8 @@
 package es.merkle.component.validators.modify;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import es.merkle.component.model.Order;
 import es.merkle.component.model.OrderStatus;
 import es.merkle.component.model.OrderType;
@@ -14,9 +17,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.List;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class CustomOrderValidatorTest {

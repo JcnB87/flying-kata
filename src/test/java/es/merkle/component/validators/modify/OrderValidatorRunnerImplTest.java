@@ -1,5 +1,7 @@
 package es.merkle.component.validators.modify;
 
+import static org.mockito.Mockito.*;
+
 import es.merkle.component.model.*;
 import es.merkle.component.modify.validating.OrderValidatorRunnerImpl;
 import es.merkle.component.modify.validating.validator.OrderValidator;
@@ -10,8 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-
-import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class OrderValidatorRunnerImplTest {
