@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -81,6 +82,8 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.finalPrice").value(99.99))
                 .andExpect(jsonPath("$.customer.id").value("customer123"))
                 .andExpect(jsonPath("$.customer.name").value("John Doe"));
+
+        verify(orderService).modifyOrder(any(ModifyOrderRequest.class));
     }
 
     @Test
@@ -101,5 +104,7 @@ class OrderControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.order.id").value("orderId"))
                 .andExpect(jsonPath("$.message").value("Order submitted successfully"));
+
+        verify(orderService).submitOrder(any(SubmitOrderRequest.class));
     }
 }
