@@ -44,6 +44,9 @@ public abstract class OrderMapper {
     @Mapping(source = "orderId", target = "id")
     public abstract Order mapSubmitOrderRequestToOrder(SubmitOrderRequest submitOrderRequest);
 
+    @Mapping(source = ".", target = "order")
+    public abstract SubmitOrderResponse mapSubmitOrderResponseToOrder(Order order);
+
     public abstract DbOrder mapToDbOrder(Order order);
 
     public abstract Order mapToOrder(DbOrder order);
@@ -56,9 +59,6 @@ public abstract class OrderMapper {
     @Mapping(target = "finalPrice", ignore = true)
     @Mapping(target = "customer", ignore = true)
     public abstract void updateOrder(Order requestedOrder, @MappingTarget Order retrievedOrder);
-
-    @Mapping(source = ".", target = "order")
-    public abstract SubmitOrderResponse mapSubmitOrderResponseToOrder(Order order);
 
     protected Customer mapCustomer(String customer) {
         try {

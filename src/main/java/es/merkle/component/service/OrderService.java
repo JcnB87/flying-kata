@@ -1,4 +1,4 @@
-package es.merkle.component.application;
+package es.merkle.component.service;
 
 import es.merkle.component.mapper.OrderMapper;
 import es.merkle.component.model.Order;
@@ -51,10 +51,6 @@ public class OrderService {
         return submitOrderResponse;
     }
 
-    private SubmitOrderResponse mapOrderToSubmitOrderResponse(Order retrievedOrder) {
-        return orderMapper.mapSubmitOrderResponseToOrder(retrievedOrder);
-    }
-
     public Order modifyOrder(ModifyOrderRequest modifyOrderRequest) {
         Order requestedOrder = mapModifyOrderRequest(modifyOrderRequest);
         Order retrievedOrder = retrieveOrder(requestedOrder);
@@ -72,6 +68,10 @@ public class OrderService {
 
     private Order mapSubmitOrderRequestToOrder(SubmitOrderRequest submitOrderRequest) {
         return orderMapper.mapSubmitOrderRequestToOrder(submitOrderRequest);
+    }
+
+    private SubmitOrderResponse mapOrderToSubmitOrderResponse(Order retrievedOrder) {
+        return orderMapper.mapSubmitOrderResponseToOrder(retrievedOrder);
     }
 
     private Order retrieveOrder(Order order) {
