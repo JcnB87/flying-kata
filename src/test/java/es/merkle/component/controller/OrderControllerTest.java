@@ -1,7 +1,9 @@
 package es.merkle.component.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.merkle.component.application.OrderService;
+import es.merkle.component.model.api.SubmitOrderRequest;
+import es.merkle.component.model.api.SubmitOrderResponse;
+import es.merkle.component.service.OrderService;
 import es.merkle.component.model.*;
 import es.merkle.component.model.api.ModifyOrderRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -22,13 +25,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-class ModifyOrderControllerTest {
+class OrderControllerTest {
 
     @Mock
-    private OrderService orderService;  // Mock the OrderService
+    private OrderService orderService;
 
     @InjectMocks
-    private OrderController orderController;  // Inject the controller with mocked services
+    private OrderController orderController;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
@@ -41,13 +44,11 @@ class ModifyOrderControllerTest {
 
     @Test
     void modifyOrder_WithAddOperation_ReturnsOrderWithAddedProducts() throws Exception {
-        // Prepare the ModifyOrderRequest
         ModifyOrderRequest modifyOrderRequest = new ModifyOrderRequest();
         modifyOrderRequest.setOrderId("order123");
         modifyOrderRequest.setProductId("product123");
         modifyOrderRequest.setOrderType(OrderType.ADD);
 
-        // Mock the behavior of orderService.modifyOrder
         Order expectedOrder = Order.builder()
                 .id("order123")
                 .customerId("customer123")
@@ -66,16 +67,9 @@ class ModifyOrderControllerTest {
 
         when(orderService.modifyOrder(any(ModifyOrderRequest.class))).thenReturn(expectedOrder);
 
-        // Act & Assert
         mockMvc.perform(post("/order-service/modify")
                         .contentType("application/json")
-                        .content("""
-                        {
-                          "orderId": "order123",
-                          "orderType": "ADD",
-                          "productId": "product123"
-                        }
-                        """))
+                        .content(objectMapper.writeValueAsString(modifyOrderRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("order123"))
                 .andExpect(jsonPath("$.customerId").value("customer123"))
@@ -88,4 +82,27 @@ class ModifyOrderControllerTest {
                 .andExpect(jsonPath("$.customer.id").value("customer123"))
                 .andExpect(jsonPath("$.customer.name").value("John Doe"));
     }
+
+    @Test
+    void shouldSubmitOrderSuccessfully() throws Exception {
+        // Initialize the request and response objects
+        SubmitOrderRequest submitOrderRequest = SubmitOrderRequest.builder()
+                .orderId("orderId")
+                .build();
+
+        // Assume that an order object is returned by the service
+        Product product = new Product("productId", "Product Name", ProductStatus.AVAILABLE, ProductCategory.TV, BigDecimal.TEN, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30));
+        Order order = new Order("orderId", "customerId", product.getId(), OrderType.ADD, OrderStatus.NEW, null, null, BigDecimal.TEN, null);
+        SubmitOrderResponse submitOrderResponse = new SubmitOrderResponse(order, "Order submitted successfully");
+
+        when(orderService.submitOrder(submitOrderRequest)).thenReturn(submitOrderResponse);
+
+        mockMvc.perform(post("/order-service/submit")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(submitOrderRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.order.id").value("orderId"))
+                .andExpect(jsonPath("$.message").value("Order submitted successfully"));
+    }
+
 }
