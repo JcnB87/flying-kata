@@ -38,8 +38,8 @@ class OrderControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(orderController).build();  // Initialize MockMvc
-        objectMapper = new ObjectMapper();  // Initialize ObjectMapper for JSON conversion
+        mockMvc = MockMvcBuilders.standaloneSetup(orderController).build();
+        objectMapper = new ObjectMapper();
     }
 
     @Test
@@ -85,12 +85,10 @@ class OrderControllerTest {
 
     @Test
     void shouldSubmitOrderSuccessfully() throws Exception {
-        // Initialize the request and response objects
         SubmitOrderRequest submitOrderRequest = SubmitOrderRequest.builder()
                 .orderId("orderId")
                 .build();
 
-        // Assume that an order object is returned by the service
         Product product = new Product("productId", "Product Name", ProductStatus.AVAILABLE, ProductCategory.TV, BigDecimal.TEN, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30));
         Order order = new Order("orderId", "customerId", product.getId(), OrderType.ADD, OrderStatus.NEW, null, null, BigDecimal.TEN, null);
         SubmitOrderResponse submitOrderResponse = new SubmitOrderResponse(order, "Order submitted successfully");
@@ -104,5 +102,4 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.order.id").value("orderId"))
                 .andExpect(jsonPath("$.message").value("Order submitted successfully"));
     }
-
 }

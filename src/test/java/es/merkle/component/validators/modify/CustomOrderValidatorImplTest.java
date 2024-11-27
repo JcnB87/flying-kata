@@ -28,7 +28,6 @@ class CustomOrderValidatorImplTest {
 
         OrderValidatorRunnerImpl runner = new OrderValidatorRunnerImpl(validators);
 
-        // Simulate that the validator returns true, meaning the order is invalid
         when(orderValidator.validate(order)).thenReturn(true);
         runner.run(order);
 

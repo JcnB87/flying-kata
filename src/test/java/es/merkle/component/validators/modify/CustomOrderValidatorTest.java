@@ -6,6 +6,7 @@ import es.merkle.component.model.OrderType;
 import es.merkle.component.modify.validating.OrderValidatorRunnerImpl;
 import es.merkle.component.modify.validating.validator.CustomOrderValidator;
 import es.merkle.component.modify.validating.validator.OrderValidator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,10 +27,15 @@ class CustomOrderValidatorTest {
     @Autowired
     private OrderValidatorRunnerImpl orderValidatorRunnerImpl;
 
+    private Order order;
+
+    @BeforeEach
+    void setup() {
+        order = new Order("orderId", "customerId", "productId", OrderType.ADD, OrderStatus.NEW, null, null, BigDecimal.TEN, null);
+    }
+
     @Test
     void shouldRunValidatorsAndSetStatusToInvalid() {
-        Order order = new Order("orderId", "customerId", "productId", OrderType.ADD, OrderStatus.NEW, null, null, BigDecimal.TEN, null);
-
         when(customOrderValidator.validate(order)).thenReturn(true); // Order is invalid
 
         orderValidatorRunnerImpl.run(order);
@@ -39,8 +45,6 @@ class CustomOrderValidatorTest {
 
     @Test
     void shouldRunValidatorsAndSetStatusToValid() {
-        Order order = new Order("orderId", "customerId", "productId", OrderType.ADD, OrderStatus.NEW, null, null, BigDecimal.TEN, null);
-
         when(customOrderValidator.validate(order)).thenReturn(false); // Order is valid
 
         orderValidatorRunnerImpl.run(order);
@@ -50,8 +54,6 @@ class CustomOrderValidatorTest {
 
     @Test
     void shouldRunMultipleValidatorsInOrder() {
-        Order order = new Order("orderId", "customerId", "productId", OrderType.ADD, OrderStatus.NEW, null, null, BigDecimal.TEN, null);
-
         List<OrderValidator> validators = List.of(customOrderValidator);
         validators.forEach(validator -> when(validator.validate(order)).thenReturn(false)); // All validators return valid
 

@@ -60,7 +60,7 @@ public class OrderServiceTest {
 
 
     @ParameterizedTest
-    @MethodSource("provideOrderValidationAndWithOrderTypeScenarios")
+    @MethodSource("provideOrderValidationAndWithOrderTypeAndStatusScenarios")
     void shouldCorrectlyModifyOrderBasedOnOrderType(OrderType orderType, ProductStatus productStatus, LocalDate expiryDate, LocalDate releaseDate, OrderStatus expectedOrderStatus) {
         String orderId = "orderId123";
         String customerId = "customerId123";
@@ -90,7 +90,7 @@ public class OrderServiceTest {
         assertEquals(expectedOrderStatus, resultOrder.getStatus());
     }
 
-    private static Stream<Arguments> provideOrderValidationAndWithOrderTypeScenarios() {
+    private static Stream<Arguments> provideOrderValidationAndWithOrderTypeAndStatusScenarios() {
         return Stream.of(
                 Arguments.of(OrderType.ADD, ProductStatus.AVAILABLE, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30), OrderStatus.VALID),
                 Arguments.of(OrderType.REMOVE, ProductStatus.AVAILABLE, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30), OrderStatus.VALID),
