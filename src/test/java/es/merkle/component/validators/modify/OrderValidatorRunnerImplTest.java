@@ -14,7 +14,7 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-class CustomOrderValidatorImplTest {
+class OrderValidatorRunnerImplTest {
 
     @MockBean
     private OrderValidator orderValidator;
