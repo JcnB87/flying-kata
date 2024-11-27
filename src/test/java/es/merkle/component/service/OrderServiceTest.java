@@ -1,15 +1,18 @@
 package es.merkle.component.service;
 
-import es.merkle.component.application.OrderService;
 import es.merkle.component.mapper.OrderMapper;
 import es.merkle.component.model.*;
 import es.merkle.component.model.api.ModifyOrderRequest;
+import es.merkle.component.model.api.SubmitOrderRequest;
+import es.merkle.component.model.api.SubmitOrderResponse;
 import es.merkle.component.processing.OrderProcessorRunner;
 import es.merkle.component.repository.OrderRepository;
 import es.merkle.component.repository.adapter.OrderAdapter;
 import es.merkle.component.repository.adapter.ProductAdapter;
 import es.merkle.component.repository.entity.DbOrder;
 import es.merkle.component.modify.validating.OrderValidatorRunner;
+import es.merkle.component.submit.validating.OrderValidatorRunner2;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -45,6 +48,9 @@ public class OrderServiceTest {
 
     @MockBean
     private OrderValidatorRunner orderValidatorRunner;
+
+    @MockBean
+    private OrderValidatorRunner2 orderValidatorRunner2;
 
     @MockBean
     private OrderProcessorRunner orderProcessorRunner;
@@ -93,5 +99,38 @@ public class OrderServiceTest {
                 Arguments.of(OrderType.REMOVE, ProductStatus.VIP, LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), OrderStatus.INVALID),
                 Arguments.of(OrderType.REMOVE, ProductStatus.AVAILABLE, LocalDate.now().minusDays(10), LocalDate.now().minusDays(1), OrderStatus.INVALID)
         );
+    }
+
+    @Test
+    void shouldCorrectlySubmitOrder() {
+        String orderId = "orderId123";
+        String customerId = "customerId123";
+        SubmitOrderRequest submitOrderRequest = new SubmitOrderRequest(orderId);
+
+        Order order = new Order(orderId, customerId, null, OrderType.ADD, OrderStatus.NEW, new ArrayList<>(), new ArrayList<>(), BigDecimal.TEN, null);
+        SubmitOrderResponse expectedResponse = new SubmitOrderResponse(order, OrderStatus.VALID.toString());
+
+        when(orderMapper.mapSubmitOrderRequestToOrder(submitOrderRequest)).thenReturn(order);
+        when(orderAdapter.retrieveOrder(orderId)).thenReturn(order);
+        when(orderMapper.mapSubmitOrderResponseToOrder(order)).thenReturn(expectedResponse);
+
+        SubmitOrderResponse actualResponse = orderService.submitOrder(submitOrderRequest);
+
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getOrder().getId(), actualResponse.getOrder().getId());
+        assertEquals(expectedResponse.getOrder().getCustomerId(), actualResponse.getOrder().getCustomerId());
+        assertNull(expectedResponse.getOrder().getProcessingProductId());
+        assertEquals(expectedResponse.getOrder().getOrderType(), actualResponse.getOrder().getOrderType());
+        assertEquals(expectedResponse.getOrder().getStatus(), actualResponse.getOrder().getStatus());
+        assertEquals(expectedResponse.getOrder().getAddingProducts(), actualResponse.getOrder().getAddingProducts());
+        assertEquals(expectedResponse.getOrder().getRemoveProducts(), actualResponse.getOrder().getRemoveProducts());
+        assertEquals(expectedResponse.getOrder().getFinalPrice(), actualResponse.getOrder().getFinalPrice());
+        assertNull(expectedResponse.getOrder().getCustomer());
+
+        verify(orderMapper, times(1)).mapSubmitOrderRequestToOrder(submitOrderRequest);
+        verify(orderAdapter, times(1)).retrieveOrder(orderId);
+        verify(orderMapper, times(1)).mapSubmitOrderResponseToOrder(order);
+        verify(orderValidatorRunner2, times(1)).run(expectedResponse);
+
     }
 }
