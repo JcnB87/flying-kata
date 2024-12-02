@@ -35,6 +35,17 @@ class OrderStatusValidatorsTest {
     @Autowired
     private ValidOrderStatusValidator validOrderStatusValidator;
 
+
+    @Test
+    void testNewOrderStatusValidator() {
+        Order order = new Order("orderId123", "customerId123", null, OrderType.ADD, OrderStatus.NEW, new ArrayList<>(), new ArrayList<>(), BigDecimal.TEN, null);
+        SubmitOrderResponse response = new SubmitOrderResponse(order, "The order was not submitted because it's not in a final status");
+
+        assertTrue(newOrderStatusValidator.validate(order));
+        newOrderStatusValidator.updateResponse(response);
+        assertEquals("The order was not submitted because it's not in a final status", response.getMessage());
+    }
+
     @Test
     void testFailedOrderStatusValidator() {
         Order order = new Order("orderId123", "customerId123", null, OrderType.ADD, OrderStatus.FAILED, new ArrayList<>(), new ArrayList<>(), BigDecimal.TEN, null);
