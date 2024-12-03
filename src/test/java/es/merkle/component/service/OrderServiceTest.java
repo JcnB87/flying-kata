@@ -102,12 +102,12 @@ public class OrderServiceTest {
     }
 
     @Test
-    void shouldCorrectlySubmitOrder() {
+    void shouldCorrectlySubmitOrderBasedOnOrderStatus() {
         String orderId = "orderId123";
         String customerId = "customerId123";
         SubmitOrderRequest submitOrderRequest = new SubmitOrderRequest(orderId);
 
-        Order order = new Order(orderId, customerId, null, OrderType.ADD, OrderStatus.NEW, new ArrayList<>(), new ArrayList<>(), BigDecimal.TEN, null);
+        Order order = new Order(orderId, customerId, null, OrderType.ADD, OrderStatus.VALID, new ArrayList<>(), new ArrayList<>(), BigDecimal.TEN, null);
         SubmitOrderResponse expectedResponse = new SubmitOrderResponse(order, OrderStatus.VALID.toString());
 
         when(orderMapper.mapSubmitOrderRequestToOrder(submitOrderRequest)).thenReturn(order);

@@ -87,7 +87,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void shouldSubmitOrderSuccessfully() throws Exception {
+    void submitOrder_WhenOrderStatusIsValid_SubmitOrderSuccessfully() throws Exception {
         SubmitOrderRequest submitOrderRequest = SubmitOrderRequest.builder()
                 .orderId("orderId")
                 .build();
